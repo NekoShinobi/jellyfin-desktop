@@ -88,7 +88,8 @@
         settings: {
             main: { enableMPV: true, fullscreen: false, userWebClient: '__SERVER_URL__' },
             playback: {
-                hwdec: _savedSettings.hwdec || 'auto-safe'
+                hwdec: _savedSettings.hwdec || 'auto-safe',
+                hdrPassthrough: _savedSettings.hdrPassthrough !== false
             },
             audio: {
                 audioPassthrough: _savedSettings.audioPassthrough || '',
@@ -102,6 +103,7 @@
         },
         settingsDescriptions: {
             playback: [
+                { key: 'hdrPassthrough', displayName: 'HDR Passthrough', help: 'Pass HDR colorspace metadata to the display when playing HDR content. Disable if your display or compositor does not support HDR or shows washed-out colors. Requires restart.' },
                 { key: 'hwdec', displayName: 'Hardware Decoding', help: 'Hardware video decoding mode. Use "auto-safe" for safe auto-detection, "auto" for aggressive auto-detection, or "no" to disable.', options: [
                     { value: 'auto-safe', title: 'Auto (Safe)' },
                     { value: 'auto', title: 'Auto' },

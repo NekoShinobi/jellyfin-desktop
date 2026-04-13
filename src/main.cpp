@@ -542,7 +542,7 @@ int main(int argc, char* argv[]) {
     g_mpv.SetOptionString("vo", "gpu-next");
     g_mpv.SetOptionString("gpu-api", "vulkan");
     g_mpv.SetOptionString("hwdec", hwdec_str);
-    g_mpv.SetOptionString("target-colorspace-hint", "yes");
+    g_mpv.SetOptionString("target-colorspace-hint", Settings::instance().hdrPassthrough() ? "yes" : "no");
     g_mpv.SetOptionString("osd-level", "0");
     g_mpv.SetOptionString("osc", "no");
     g_mpv.SetOptionString("input-default-bindings", "no");
