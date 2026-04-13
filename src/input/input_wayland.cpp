@@ -348,8 +348,10 @@ void input_thread_func() {
             // Poke mpv's VO thread so it promptly dispatches its own
             // (default) queue — catches xdg_wm_base ping events that
             // landed there while mpv was sleeping between frames.
-            if (g.mpv_wakeup_fd >= 0)
-                (void)write(g.mpv_wakeup_fd, &(char){0}, 1);
+            if (g.mpv_wakeup_fd >= 0) {
+                const char zero = 0;
+                (void)write(g.mpv_wakeup_fd, &zero, 1);
+            }
         } else {
             wl_display_cancel_read(g.display);
         }
