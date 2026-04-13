@@ -163,6 +163,12 @@ public:
         out = static_cast<intptr_t>(val);
         return err;
     }
+    int GetWaylandWakeupWriteFd(int& out) {
+        int64_t val = -1;
+        int err = GetPropertyInt("wayland-wakeup-write-fd", val);
+        out = static_cast<int>(val);
+        return err;
+    }
 
 private:
     // =====================================================================

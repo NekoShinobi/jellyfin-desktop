@@ -818,9 +818,16 @@ static bool wl_init(mpv_handle* mpv) {
     // Dedicated event queue: all our objects live here, isolated from mpv's VO queue
     g_wl.queue = wl_display_create_queue(display);
 
+    // Get mpv's VO wakeup pipe write-end. The input thread writes to this fd
+    // after every wl_display_read_events() so mpv's VO thread promptly
+    // dispatches its default queue (catches xdg_wm_base ping → pong while
+    // mpv sleeps between frames, preventing Hyprland "not responding" dialogs).
+    int mpv_wakeup_fd = -1;
+    g_mpv.GetWaylandWakeupWriteFd(mpv_wakeup_fd);
+
     // Prepare the input layer so its xkb context is ready before the registry
     // callbacks land (seat_caps wires up keyboard listeners that need xkb).
-    input::wayland::init(display, g_wl.queue);
+    input::wayland::init(display, g_wl.queue, mpv_wakeup_fd);
 
     auto* reg = wl_display_get_registry(display);
     wl_proxy_set_queue(reinterpret_cast<wl_proxy*>(reg), g_wl.queue);

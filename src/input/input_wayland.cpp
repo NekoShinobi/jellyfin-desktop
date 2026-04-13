@@ -29,6 +29,11 @@ struct State {
     wl_display*      display = nullptr;
     wl_event_queue*  queue   = nullptr;
 
+    // Write end of mpv VO thread's wakeup pipe.  Written after every
+    // wl_display_read_events() call so mpv's VO thread promptly dispatches
+    // its own (default) queue — most importantly xdg_wm_base ping → pong.
+    int mpv_wakeup_fd = -1;
+
     // Input thread polling wl_display's fd.
     std::thread input_thread;
 
@@ -340,6 +345,11 @@ void input_thread_func() {
 
         if (fds[0].revents & POLLIN) {
             wl_display_read_events(g.display);
+            // Poke mpv's VO thread so it promptly dispatches its own
+            // (default) queue — catches xdg_wm_base ping events that
+            // landed there while mpv was sleeping between frames.
+            if (g.mpv_wakeup_fd >= 0)
+                (void)write(g.mpv_wakeup_fd, &(char){0}, 1);
         } else {
             wl_display_cancel_read(g.display);
         }
@@ -357,10 +367,11 @@ void input_thread_func() {
 
 // --- Public API -------------------------------------------------------------
 
-void init(wl_display* display, wl_event_queue* queue) {
-    g.display = display;
-    g.queue   = queue;
-    g.xkb_ctx = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
+void init(wl_display* display, wl_event_queue* queue, int mpv_wakeup_fd) {
+    g.display        = display;
+    g.queue          = queue;
+    g.mpv_wakeup_fd  = mpv_wakeup_fd;
+    g.xkb_ctx        = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
 }
 
 void attach_seat(wl_seat* seat) {

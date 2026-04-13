@@ -9,7 +9,10 @@ namespace input::wayland {
 
 // Initializes xkb context. Must be called before any listener fires.
 // `display` and `queue` are borrowed — caller owns their lifetime.
-void init(wl_display* display, wl_event_queue* queue);
+// `mpv_wakeup_fd` is the write end of mpv's VO wakeup pipe (-1 if not available);
+// the input thread writes to it after reading Wayland events so mpv's VO thread
+// promptly dispatches its own queue (e.g. xdg_wm_base ping → pong).
+void init(wl_display* display, wl_event_queue* queue, int mpv_wakeup_fd = -1);
 
 // Called by platform_wayland's registry binding when a wl_seat appears.
 // Stores the seat and attaches the seat listener (which will in turn
