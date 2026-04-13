@@ -362,9 +362,18 @@
         togglePictureInPicture() {}
         toggleAirPlay() {}
         getStats() { return Promise.resolve({ categories: [] }); }
-        getSupportedAspectRatios() { return []; }
-        getAspectRatio() { return 'normal'; }
-        setAspectRatio(value) {}
+        getSupportedAspectRatios() {
+            return [
+                { id: 'normal', name: this.globalize.translate('Auto') },
+                { id: 'fill',   name: this.globalize.translate('AspectRatioFill') },
+                { id: 'cover',  name: this.globalize.translate('AspectRatioCover') },
+            ];
+        }
+        getAspectRatio() { return this._aspectRatio || 'normal'; }
+        setAspectRatio(value) {
+            this._aspectRatio = value;
+            window.api.player.setAspectRatio(value);
+        }
     }
 
     window._mpvVideoPlayer = mpvVideoPlayer;

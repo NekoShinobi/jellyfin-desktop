@@ -425,6 +425,8 @@ bool Client::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefRefPtr<C
         g_mpv.SetAudioTrack(args->GetInt(0));
     } else if (name == "playerSetAudioDelay") {
         g_mpv.SetAudioDelay(args->GetDouble(0));
+    } else if (name == "playerSetAspectRatio") {
+        g_mpv.SetAspectRatio(args->GetString(0).ToString());
     } else if (name == "toggleFullscreen") {
         g_platform.toggle_fullscreen();
     } else if (name == "saveServerUrl") {

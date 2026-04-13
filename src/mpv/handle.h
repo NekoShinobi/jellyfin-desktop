@@ -104,7 +104,20 @@ public:
     void SetAudioTrack(int64_t id)       { SetPropertyIntAsync("aid", id); }
     void SetSubtitleTrack(int64_t id)    { SetPropertyIntAsync("sid", id); }
     void SetAudioDelay(double secs)      { SetPropertyDoubleAsync("audio-delay", secs); }
-    void SetStartPosition(double secs)   { SetPropertyDoubleAsync("start", secs); }    void SubAdd(const std::string& url)   { CommandAsync({"sub-add", url, "select"}); }
+    void SetStartPosition(double secs)   { SetPropertyDoubleAsync("start", secs); }
+    // Aspect ratio modes: "normal" = letterbox (default), "fill" = stretch, "cover" = zoom/crop
+    void SetAspectRatio(const std::string& mode) {
+        if (mode == "fill") {
+            SetPropertyFlagAsync("keepaspect", false);
+            SetPropertyDoubleAsync("panscan", 0.0);
+        } else if (mode == "cover") {
+            SetPropertyFlagAsync("keepaspect", true);
+            SetPropertyDoubleAsync("panscan", 1.0);
+        } else {  // "normal" or anything else → restore defaults
+            SetPropertyFlagAsync("keepaspect", true);
+            SetPropertyDoubleAsync("panscan", 0.0);
+        }
+    }    void SubAdd(const std::string& url)   { CommandAsync({"sub-add", url, "select"}); }
     // mpv track selection: -1 = auto, 0 = disable, 1+ = specific track
     static constexpr int64_t kTrackAuto    = -1;
     static constexpr int64_t kTrackDisable =  0;

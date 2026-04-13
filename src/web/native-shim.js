@@ -264,6 +264,10 @@
                 console.log('[Media] player.setAudioDelay:', ms);
                 if (window.jmpNative) window.jmpNative.playerSetAudioDelay(ms / 1000.0);
             },
+            setAspectRatio(mode) {
+                console.log('[Media] player.setAspectRatio:', mode);
+                if (window.jmpNative) window.jmpNative.playerSetAspectRatio(mode);
+            },
             setVideoRectangle(x, y, w, h) {
                 // No-op for now, we always render fullscreen
             },
@@ -538,9 +542,10 @@
         const modalContainer = document.createElement('div');
         modalContainer.className = 'dialogContainer';
         modalContainer.style.backgroundColor = 'rgba(0,0,0,0.5)';
-        modalContainer.addEventListener('click', e => {
-            if (e.target === modalContainer) modalContainer.remove();
-        });
+        const closeModal = () => { modalContainer.remove(); document.removeEventListener('keydown', onKeyDown); };
+        const onKeyDown = e => { if (e.key === 'Escape') closeModal(); };
+        modalContainer.addEventListener('click', e => { if (e.target === modalContainer) closeModal(); });
+        document.addEventListener('keydown', onKeyDown);
         document.body.appendChild(modalContainer);
 
         const dialog = document.createElement('div');
@@ -555,6 +560,15 @@
         title.className = 'formDialogHeaderTitle';
         title.textContent = 'Client Settings';
         header.appendChild(title);
+
+        const closeBtn = document.createElement('button');
+        closeBtn.setAttribute('is', 'paper-icon-button-light');
+        closeBtn.className = 'btnCancel btnClose autoSize';
+        closeBtn.tabIndex = -1;
+        closeBtn.title = 'Close';
+        closeBtn.innerHTML = '<span class="material-icons close" aria-hidden="true"></span>';
+        closeBtn.addEventListener('click', () => closeModal());
+        header.appendChild(closeBtn);
 
         const contents = document.createElement('div');
         contents.className = 'formDialogContent smoothScrollY';
