@@ -1059,3 +1059,4 @@ int main(int argc, char* argv[]) {
     if (g_log_file) fclose(g_log_file);
     return 0;
 }
+

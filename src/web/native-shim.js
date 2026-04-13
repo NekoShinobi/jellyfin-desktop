@@ -180,10 +180,22 @@
                 console.log('[Media] player.load:', url);
                 window._jmpVideoActive = streamdata?.type === 'video';
                 if (callback) {
-                    // Wait for playing signal before calling callback
+                    // Apply tracks after FILE_LOADED fires, not via playerLoad options.
+                    // If tracks were passed in playerLoad, they race with any
+                    // setAudioStream/setSubtitleStream calls made before load() by
+                    // Jellyfin-web's playback manager restoring preferences from the
+                    // previous episode — the loadfile option wins and resets mpv's
+                    // track to the server default instead of the user's preference.
+                    // Applying after FILE_LOADED (the playing signal) guarantees mpv
+                    // has finished selecting its initial tracks before we override.
                     const onPlaying = () => {
                         this.playing.disconnect(onPlaying);
                         this.error.disconnect(onError);
+                        if (window.jmpNative) {
+                            if (audioStream > 0) window.jmpNative.playerSetAudio(audioStream);
+                            // sid=0 means "disable subtitles" — respect that explicitly
+                            if (subtitleStream >= 0) window.jmpNative.playerSetSubtitle(subtitleStream);
+                        }
                         callback();
                     };
                     const onError = () => {
@@ -196,7 +208,8 @@
                 }
                 if (window.jmpNative && window.jmpNative.playerLoad) {
                     const metadataJson = streamdata?.metadata ? JSON.stringify(streamdata.metadata) : '{}';
-                    window.jmpNative.playerLoad(url, options.startMilliseconds, audioStream, subtitleStream, metadataJson);
+                    // Pass TRACK_AUTO (-1) for both tracks — applied in onPlaying above.
+                    window.jmpNative.playerLoad(url, options.startMilliseconds, -1, -1, metadataJson);
                 }
             },
             stop() {

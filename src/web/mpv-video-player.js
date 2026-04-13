@@ -154,8 +154,10 @@
                 const defaultAudioIdx = options.mediaSource.DefaultAudioStreamIndex ?? -1;
                 const defaultSubIdx = options.mediaSource.DefaultSubtitleStreamIndex ?? -1;
 
-                // Convert audio index from Jellyfin global stream index to mpv 1-based audio track index
-                let audioParam = MpvPlayerCore.TRACK_DISABLE;
+                // Convert audio index from Jellyfin global stream index to mpv 1-based audio track index.
+                // Default to TRACK_AUTO (not TRACK_DISABLE) — disabling audio when the server doesn't
+                // specify a default would silently mute playback.
+                let audioParam = MpvPlayerCore.TRACK_AUTO;
                 if (defaultAudioIdx >= 0) {
                     const relIdx = getRelativeIndexByType(streams, defaultAudioIdx, 'Audio');
                     audioParam = relIdx != null ? relIdx : MpvPlayerCore.TRACK_AUTO;
