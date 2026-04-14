@@ -37,6 +37,11 @@ public:
                  const void*, int w, int h) override;
     void OnAcceleratedPaint(CefRefPtr<CefBrowser>, PaintElementType type,
                             const RectList&, const CefAcceleratedPaintInfo& info) override;
+    bool OnBeforePopup(CefRefPtr<CefBrowser>, CefRefPtr<CefFrame>,
+                       int, const CefString& target_url, const CefString&,
+                       WindowOpenDisposition, bool, const CefPopupFeatures&,
+                       CefWindowInfo&, CefRefPtr<CefClient>&, CefBrowserSettings&,
+                       CefRefPtr<CefDictionaryValue>&, bool*) override;
     void OnAfterCreated(CefRefPtr<CefBrowser> browser) override;
     void OnBeforeClose(CefRefPtr<CefBrowser>) override;
     void OnLoadEnd(CefRefPtr<CefBrowser>, CefRefPtr<CefFrame> frame, int) override;
@@ -102,6 +107,11 @@ public:
                  const void*, int w, int h) override;
     void OnAcceleratedPaint(CefRefPtr<CefBrowser>, PaintElementType type,
                             const RectList&, const CefAcceleratedPaintInfo& info) override;
+    bool OnBeforePopup(CefRefPtr<CefBrowser>, CefRefPtr<CefFrame>,
+                       int, const CefString& target_url, const CefString&,
+                       WindowOpenDisposition, bool, const CefPopupFeatures&,
+                       CefWindowInfo&, CefRefPtr<CefClient>&, CefBrowserSettings&,
+                       CefRefPtr<CefDictionaryValue>&, bool*) override;
     void OnAfterCreated(CefRefPtr<CefBrowser> browser) override;
     void OnBeforeClose(CefRefPtr<CefBrowser>) override;
     void OnLoadEnd(CefRefPtr<CefBrowser>, CefRefPtr<CefFrame> frame, int) override;

@@ -169,6 +169,24 @@ void Client::OnAcceleratedPaint(CefRefPtr<CefBrowser>, PaintElementType type,
     g_platform.present(info);
 }
 
+static void open_url_externally(const std::string& url) {
+    // Spawn xdg-open detached; ignore failures silently.
+    std::string cmd = "xdg-open " + url + " &";
+    (void)system(cmd.c_str());
+}
+
+bool Client::OnBeforePopup(CefRefPtr<CefBrowser>, CefRefPtr<CefFrame>,
+                           int, const CefString& target_url, const CefString&,
+                           WindowOpenDisposition, bool,
+                           const CefPopupFeatures&, CefWindowInfo&,
+                           CefRefPtr<CefClient>&, CefBrowserSettings&,
+                           CefRefPtr<CefDictionaryValue>&, bool*) {
+    std::string url = target_url.ToString();
+    LOG_INFO(LOG_CEF, "[CLIENT] OnBeforePopup: blocking popup, opening externally: %s", url.c_str());
+    open_url_externally(url);
+    return true; // cancel popup
+}
+
 void Client::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
     LOG_INFO(LOG_CEF, "[CLIENT] Client::OnAfterCreated browser=%p id=%d",
              browser.get(), browser ? browser->GetIdentifier() : -1);
@@ -551,6 +569,18 @@ void OverlayClient::OnAcceleratedPaint(CefRefPtr<CefBrowser>, PaintElementType t
                                        const RectList&, const CefAcceleratedPaintInfo& info) {
     if (type != PET_VIEW) return;
     g_platform.overlay_present(info);
+}
+
+bool OverlayClient::OnBeforePopup(CefRefPtr<CefBrowser>, CefRefPtr<CefFrame>,
+                                  int, const CefString& target_url, const CefString&,
+                                  WindowOpenDisposition, bool,
+                                  const CefPopupFeatures&, CefWindowInfo&,
+                                  CefRefPtr<CefClient>&, CefBrowserSettings&,
+                                  CefRefPtr<CefDictionaryValue>&, bool*) {
+    std::string url = target_url.ToString();
+    LOG_INFO(LOG_CEF, "[OVERLAY] OnBeforePopup: blocking popup, opening externally: %s", url.c_str());
+    open_url_externally(url);
+    return true; // cancel popup
 }
 
 void OverlayClient::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
